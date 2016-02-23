@@ -31,8 +31,10 @@ route_matchers() ->
           antiaffinitypolicy_handler, [] },
       { io_lib:format("/v2/autoscalePolicies/~s/[:id]", [?ALIAS]),
           autoscalepolicy_handler, [] },
-      { io_lib:format("/v2/datacenters/~s/[:id/[:capability_type]]", [?ALIAS]),
+      { io_lib:format("/v2/datacenters/~s/[:id/[:suffix]]", [?ALIAS]),
           [is_dc_capability()], datacenter_handler, [] },
+      { io_lib:format("/v2/groups/~s/[:id/[:suffix]]", [?ALIAS]),
+          [is_group_extension()], groups_handler, [] },
       { io_lib:format("/v2/invoice/~s/:year/:month", [?ALIAS]),
           invoice_handler, [] },
       { io_lib:format("/v2/servers/~s/:server_id/cpuAutoscalePolicy", [?ALIAS]),
@@ -40,10 +42,19 @@ route_matchers() ->
      ]
     } ].
 
-is_dc_capability() ->
-  F = fun(<<"deploymentCapabilities">>) -> true;
-         (<<"bareMetalCapabilities">>)  -> true;
-         (_)                            -> false
-      end,
+is_group_extension() ->
+	whitelist_constraint(suffix, [?GROUP_BILLING_PATH,
+																?GROUP_AUTOSCALE_PATH,
+																?GROUP_STATISTICS_PATH,
+                                ?GROUP_ACTIVITIES_PATH]).
 
-  {capability_type, function, F}.
+is_dc_capability() ->
+	whitelist_constraint(suffix, [?DC_DEPLOY_CAPABILITY_PATH,
+																?DC_BAREMETAL_CAPABILITY_PATH]).
+
+whitelist_constraint(SegmentName, ValidValues) ->
+	F = fun(Path) ->
+				lists:member(Path, ValidValues)
+			end,
+
+  {SegmentName, function, F}.

@@ -1,1 +1,7 @@
 -define(ALIAS, "MOCK").
+-define(GROUP_BILLING_PATH, <<"billing">>).
+-define(GROUP_AUTOSCALE_PATH, <<"horizontalAutoscalePolicy">>).
+-define(GROUP_STATISTICS_PATH, <<"statistics">>).
+-define(GROUP_ACTIVITIES_PATH, <<"ScheduledActivities">>).
+-define(DC_DEPLOY_CAPABILITY_PATH, <<"deploymentCapabilities">>).
+-define(DC_BAREMETAL_CAPABILITY_PATH, <<"bareMetalCapabilities">>).
