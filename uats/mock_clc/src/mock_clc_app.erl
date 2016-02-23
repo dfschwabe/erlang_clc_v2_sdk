@@ -11,7 +11,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-  gen_server:start(?DATASERVER, data_server, [], []),
+  data_server_sup:start_link(),
   Dispatch = cowboy_router:compile(route_matchers()),
   {ok, _} = cowboy:start_http(http, 100, [{port, 8000}], [{env, [{dispatch, Dispatch}]}]).
 
