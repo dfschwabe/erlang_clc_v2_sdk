@@ -19,7 +19,6 @@ stop(_State) ->
   ok.
 
 route_matchers() ->
-
   [ {'_',
      [
       { io_lib:format("/v2/accounts/~s/customFields", [?ALIAS]),
@@ -32,15 +31,19 @@ route_matchers() ->
           antiaffinitypolicy_handler, [] },
       { io_lib:format("/v2/autoscalePolicies/~s/[:id]", [?ALIAS]),
           autoscalepolicy_handler, [] },
-      { io_lib:format("/v2/datacenters/~s/[:id]", [?ALIAS]),
-          datacenter_handler, [] },
-      { io_lib:format("/v2/datacenters/~s/:id/deploymentCapabilities", [?ALIAS]),
-          dc_deployment_capability_handler, [] },
-      { io_lib:format("/v2/datacenters/~s/:id/bareMetalCapabilities", [?ALIAS]),
-          dc_baremetal_capability_handler, [] },
+      { io_lib:format("/v2/datacenters/~s/[:id/[:capability_type]]", [?ALIAS]),
+          [is_dc_capability()], datacenter_handler, [] },
       { io_lib:format("/v2/invoice/~s/:year/:month", [?ALIAS]),
           invoice_handler, [] },
       { io_lib:format("/v2/servers/~s/:server_id/cpuAutoscalePolicy", [?ALIAS]),
           server_autoscalepolicy_handler, [] }
      ]
     } ].
+
+is_dc_capability() ->
+  F = fun(<<"deploymentCapabilities">>) -> true;
+         (<<"bareMetalCapabilities">>)  -> true;
+         (_)                            -> false
+      end,
+
+  {capability_type, function, F}.

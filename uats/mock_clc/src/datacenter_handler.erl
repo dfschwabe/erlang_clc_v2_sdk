@@ -40,10 +40,15 @@ unsupported(Req, State) ->
 
 get(Req, State) ->
   Id = element(1, cowboy_req:binding(id, Req)),
-  Response = get_datacenters(Id),
+  CapabilityType = element(1, cowboy_req:binding(capability_type, Req)),
+  Response = get_datacenters(Id, CapabilityType),
   {jiffy:encode(Response), Req, State}.
 
-get_datacenters(undefined) ->
+get_datacenters(undefined, _) ->
   data_server:get(datacenters);
-get_datacenters(Id) ->
-  data_server:get(datacenters, Id).
+get_datacenters(Id, undefined) ->
+  data_server:get(datacenters, Id);
+get_datacenters(Id, <<"deploymentCapabilities">>) ->
+  data_server:get(datacenter_deployment_capabilities, Id);
+get_datacenters(Id, <<"bareMetalCapabilities">>) ->
+  data_server:get(datacenter_baremetal_capabilities, Id).
